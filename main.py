@@ -125,12 +125,85 @@ def validate_date(date):
     
     return date
 
-#This funtion validates sign in information
-def validate_signin(username, password):
-    no_user_found = True
-
+#This function search a user by username
+def find_user_by_username(username):
+    user_found = False
     for user in data_users:
         
+        if user["mobile_number"] == username:
+            user_found = True
+            return user
+    
+    if user_found == False:
+        print('You have not Signed up with this Contact Number, Please Sign Up first\n')
+        return any
+
+#This function validates if old password match with the saved user password   
+def validate_user_password():
+    username = input('\nPlease enter your Username (Mobile number): ')
+    user = find_user_by_username(username)
+
+    if user != any:
+        old_password = input('\nPlease enter your old password: ')
+        
+        if user["password"] == old_password:
+            return True
+        
+        else:
+            print("You have entered the wrong Password.\nPlease try again\n")
+            return False
+    
+    return False
+
+#This function allow to reset user password from signin option 1  
+def reset_password(user):
+    is_a_valid_user = validate_user_password()
+            
+    if is_a_valid_user:
+        new_password = input('\nPlease enter your new password: ')
+        confirm_new_password = input('\nPlease confirm your new password: ')
+        validate_password(new_password,confirm_new_password)
+        user["password"] = new_password
+        print("Your password has been reset succesfully.")
+        return user
+
+    return any
+
+#This function allow to reset password when maximum attemp is over
+def signin_max_attemp_user():
+    username = input('Please enter your Username (Mobile number) to confirm: ')
+    user = find_user_by_username(username)
+
+    if user != any:
+        date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
+
+        if user["date_of_birth"] == date_of_birth:
+            new_password = input('Please enter your new password: ')
+            confirm_new_password = input('Please confirm your new password: ')
+            validate_password(new_password,confirm_new_password)
+
+            if user["password"] != new_password:
+                user["password"] = new_password
+                print("Your password has been reset succesfully.")
+                return user
+            
+            else:
+                print("You cannot use the password used earlier.\n")
+                return any
+        
+        else:
+            print("You type a wrong date of birth.\n")
+            return any
+    else:
+        return any
+
+#This funtion validates sign in information
+def validate_signin():
+    username = input('\nPlease enter your username (Mobile Number): ')
+    password = input('Please enter your password: ')
+    user = find_user_by_username(username)
+
+    if user != any:
         if user["mobile_number"] == username:
 
             if user["password"] == password:
@@ -140,103 +213,55 @@ def validate_signin(username, password):
             else:
                 print('You have entered the wrong Password.\nPlease try againg\n')
                 return any
-    
-    if no_user_found:
-        print('You have not Signed up with this Contact Number, Please Sign Up first\n')
-        return any
-
-#This function validates if old password match with the saved user password   
-def validate_user_password(user):
-    username = input('\nPlease enter your Username (Mobile number): ')
-    old_password = input('\nPlease enter your old password: ')
-    
-    if user["password"] == old_password:
-        return True
-    
     else:
-        print("You have entered the wrong Password.\nPlease try again\n")
         return False
 
-#This function allow to reset password when maximum attemp is over
-def validate_max_attemp_user(user):
-    username = input('\nPlease enter your Username (Mobile number) to confirm: ')
-
-    if user["mobile_number"] == username:
-        date_of_birth = input('\nPlease Enter your Date of Birth # DD/MM/YYYY (No Space): ')
-
-        if user["date_of_birth"] == date_of_birth:
-            new_password = input('\nPlease enter your new password: ')
-            confirm_new_password = input('\nPlease enter your new password: ')
-            validate_password(new_password,confirm_new_password)
-
-            if user["password"] != new_password:
-                user["password"] = new_password
-                return user
-            
-            else:
-                print("You cannot use the password used earlier.\n")
-                return any
-        
-        else:
-            print("You cannot use the password used earlier.\n")
-            return any
-    else:
-        return any
-
-#This function allow to reset user password  
-def reset_password(user):
-    attemp = 0
-    is_valid = False
-
-    while is_valid == False:
-        valid_user = validate_user_password(user)
-
-        if attemp == 2:
-            print("You have used the maximum attemps of login:\nPlease reset the password by entering the below details:\n")
-            return validate_max_attemp_user(user)
-            
-        if valid_user:
-            new_password = input('\nPlease enter your new password: ')
-            
-            if user["password"] != new_password:
-                confirm_new_password = input('\nPlease enter your new password: ')
-                validate_password(new_password,confirm_new_password)
-
-                user["password"] = new_password
-                is_valid = True
-
-            else:
-                print("You cannot use the password used earlier.\nPlease try again")
-                attemp += 1
-
-        else:
-            attemp += 1
-            
 def signin_menu(user):
     select_signin = input('Please Enter 1 for Resetting the Password.\nPlease Enter 2 for Signout.\n')
     while select_signin != '2':
         
         if select_signin == '1':
-            if reset_password(user) != any:
-                select_signin = '0'
-            else:
-                return
+            reset_password(user)
+            select_signin = '0'
+
         else:
             select_signin = input('Please Enter 1 for Resetting the Password.\nPlease Enter 2 for Signout.\n')
 
     return
 
+def signin():
+    attemp = 0
+    is_valid = False
+
+    while is_valid == False:
+        if attemp == 3:
+            print("You have used the maximum attemps of login:\nPlease reset the password by entering the below details:")
+            return signin_max_attemp_user()
+        
+        valid_user = validate_signin()
+    
+        if valid_user == False:
+            return
+
+        elif valid_user != any:
+            signin_menu(valid_user)
+            attemp = 0
+            is_valid = True
+        
+        else:
+            attemp += 1
+
 def signup():
     name = input('\nPlease enter your full name: ')
 
-    mobile_number = input('\nPlease enter your mobile number: ')
+    mobile_number = input('Please enter your mobile number: ')
     validate_mobile_number(mobile_number)
     
-    password = input('\nPlease enter your password: ')
-    confirm_password = input('\nPlease confirm your password: ')
+    password = input('Please enter your password: ')
+    confirm_password = input('Please confirm your password: ')
     validate_password(password, confirm_password)
     
-    date_of_birth = input('\nPlease Enter your Date of Birth # DD/MM/YYYY (No Space): ')
+    date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
     validate_date(date_of_birth)
     age = 2022 - int(date_of_birth[-4:])
 
@@ -248,21 +273,13 @@ def signup():
         "name": name,
         "mobile_number": mobile_number,
         "password": password,
-        "date_of_birth": date_of_birth
+        "date_of_birth": date_of_birth,
+        "attemp": 0
     })
 
     print('You have Successfully Signed up.\n')
     
     return data_users
-
-def signin():
-    user_name = input('\nPlease enter your username (Mobile Number): ')
-    password = input('\nPlease enter your password: ')
-    valid_user = validate_signin(user_name, password)
-    
-    if valid_user != any:
-        signin_menu(valid_user)
-        return
 
 def run():
     select = input('Please Enter 1 for Sign up.\nPlease Enter 2 for Sign in.\nPlease Enter 3 for Quit.\n')
