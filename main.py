@@ -130,7 +130,7 @@ def find_user_by_username(username):
     user_found = False
     for user in data_users:
         
-        if user["mobile_number"] == username:
+        if user[1] == username:
             user_found = True
             return user
     
@@ -146,7 +146,7 @@ def validate_user_password():
     if user != any:
         old_password = input('\nPlease enter your old password: ')
         
-        if user["password"] == old_password:
+        if user[2] == old_password:
             return True
         
         else:
@@ -163,9 +163,15 @@ def reset_password(user):
         new_password = input('\nPlease enter your new password: ')
         confirm_new_password = input('\nPlease confirm your new password: ')
         validate_password(new_password,confirm_new_password)
-        user["password"] = new_password
-        print("Your password has been reset succesfully.")
-        return user
+        
+        if user[2] != new_password:
+            user[2] = new_password
+            print("Your password has been reset succesfully.")
+            return user
+            
+        else:
+            print("You cannot use the password used earlier.\n")
+            return any
 
     return any
 
@@ -177,13 +183,13 @@ def signin_max_attemp_user():
     if user != any:
         date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
 
-        if user["date_of_birth"] == date_of_birth:
+        if user[3] == date_of_birth:
             new_password = input('Please enter your new password: ')
             confirm_new_password = input('Please confirm your new password: ')
             validate_password(new_password,confirm_new_password)
 
-            if user["password"] != new_password:
-                user["password"] = new_password
+            if user[2] != new_password:
+                user[2] = new_password
                 print("Your password has been reset succesfully.")
                 return user
             
@@ -204,10 +210,10 @@ def validate_signin():
     user = find_user_by_username(username)
 
     if user != any:
-        if user["mobile_number"] == username:
+        if user[1] == username:
 
-            if user["password"] == password:
-                print('You have Successfully Signed in.\nWelcome ' + user["name"] + '\n')
+            if user[2] == password:
+                print('You have Successfully Signed in.\nWelcome ' + user[0] + '\n')
                 return user
 
             else:
@@ -269,13 +275,12 @@ def signup():
         print('Only users over 21 years of age can register.\n')
         return
 
-    data_users.append({
-        "name": name,
-        "mobile_number": mobile_number,
-        "password": password,
-        "date_of_birth": date_of_birth,
-        "attemp": 0
-    })
+    data_users.append([
+        name,
+        mobile_number,
+        password,
+        date_of_birth
+    ])
 
     print('You have Successfully Signed up.\n')
     
