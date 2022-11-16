@@ -3,35 +3,19 @@ data_users = []
 
 #This function validates mobile number
 def validate_mobile_number(mobile_number):
-    is_valid = False
     
-    while is_valid == False:
-        try:
-            if mobile_number.isnumeric() == False:
-                raise TypeError('The entered value is not a number\n')
-            
-            elif len(mobile_number) != 10:
-                raise ValueError('Enter a 10 digit number\n')
-            
-            elif mobile_number[0] != '0':
-                raise NameError('The cell number must begin with 0\n')
-            
-            else:
-                is_valid = True
-
-        except TypeError as TE:
-            print(TE)
-            mobile_number = input('Please enter your mobile number: ')
-        
-        except ValueError as VE:
-            print(VE)
-            mobile_number = input('Please enter your mobile number: ')
-        
-        except NameError as NE:
-            print(NE)
-            mobile_number = input('Please enter your mobile number: ')
+    if mobile_number.isnumeric() == False:
+        print('The entered value is not a number\n')
+                    
+    elif len(mobile_number) != 10:
+        print('Enter a 10 digit number\n')
     
-    return mobile_number
+    elif mobile_number[0] != '0':
+        print('The cell number must begin with 0\n')
+    else:    
+        return mobile_number
+    
+    return False
 
 #This function validates if password contains an @ or $
 def validate_special_character(password):
@@ -65,50 +49,26 @@ def validate_last_character(password):
 
 #This function validates passwords
 def validate_password(password, confirm_password):
-    is_valid = False
+    s_character = validate_special_character(password)
+    s_alphabetic = validate_alphabetic(password)
+    s_numeric = validate_last_character(password)
     
-    while is_valid == False:
-        try:
-            s_character = validate_special_character(password)
-            s_alphabetic = validate_alphabetic(password)
-            s_numeric = validate_last_character(password)
-            
-            if password != confirm_password:
-                raise NameError('Your passwords are not matching.\nPlease start again:\n')
+    if password != confirm_password:
+        print('Your passwords are not matching.\nPlease start again:\n')
 
-            elif s_character == False:
-                raise ValueError('The password must have a @ or an &.\nPlease start again\n')
-            
-            elif s_alphabetic == False:
-                raise AttributeError('The first character of the password must be a letter.\nPlease start again\n')
-            
-            elif s_numeric == False:
-                raise TypeError('The last element of the password must be a number\n')
-
-            else:
-                is_valid = True
-        
-        except NameError as NE:
-            print(NE)
-            password = input('Please enter your password: ')
-            confirm_password = input('\nPlease confirm your password: ')
-
-        except TypeError as TE:
-            print(TE)
-            password = input('Please enter your password: ')
-            confirm_password = input('\nPlease confirm your password: ')
-        
-        except AttributeError as AE:
-            print(AE)
-            password = input('Please enter your password: ')
-            confirm_password = input('\nPlease confirm your password: ')
-        
-        except ValueError as VE:
-            print(VE)
-            password = input('Please enter your password: ')
-            confirm_password = input('\nPlease confirm your password: ')
+    elif s_character == False:
+        print('The password must have a @ or an &.\nPlease start again\n')
     
-    return password
+    elif s_alphabetic == False:
+        print('The first character of the password must be a letter.\nPlease start again\n')
+    
+    elif s_numeric == False:
+        print('The last element of the password must be a number\n')
+
+    else:
+        return password
+    
+    return False
 
 #This function validates date of birth
 def validate_date(date):
@@ -160,18 +120,23 @@ def reset_password(user):
     is_a_valid_user = validate_user_password()
             
     if is_a_valid_user:
-        new_password = input('\nPlease enter your new password: ')
-        confirm_new_password = input('\nPlease confirm your new password: ')
-        validate_password(new_password,confirm_new_password)
+        is_a_valid_password = False
+
+        while is_a_valid_password == False:
+            new_password = input('\nPlease enter your new password: ')
+            confirm_new_password = input('\nPlease confirm your new password: ')
+            response = validate_password(new_password,confirm_new_password)
+
+            if response != False:
         
-        if user[2] != new_password:
-            user[2] = new_password
-            print("Your password has been reset succesfully.")
-            return user
-            
-        else:
-            print("You cannot use the password used earlier.\n")
-            return any
+                if user[2] != new_password:
+                    user[2] = new_password
+                    print("Your password has been reset succesfully.")
+                    return user
+                    
+                else:
+                    print("You cannot use the password used earlier.\n")
+                    return any
 
     return any
 
@@ -182,20 +147,25 @@ def signin_max_attemp_user():
 
     if user != any:
         date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
+        print(user[3])
 
         if user[3] == date_of_birth:
-            new_password = input('Please enter your new password: ')
-            confirm_new_password = input('Please confirm your new password: ')
-            validate_password(new_password,confirm_new_password)
+            is_a_valid_password = False
 
-            if user[2] != new_password:
-                user[2] = new_password
-                print("Your password has been reset succesfully.")
-                return user
-            
-            else:
-                print("You cannot use the password used earlier.\n")
-                return any
+            while is_a_valid_password == False:
+                new_password = input('Please enter your new password: ')
+                confirm_new_password = input('Please confirm your new password: ')
+                response = validate_password(new_password,confirm_new_password)
+
+                if response != False:
+                    if user[2] != new_password:
+                        user[2] = new_password
+                        print("Your password has been reset succesfully.")
+                        return user
+                    
+                    else:
+                        print("You cannot use the password used earlier.\n")
+                        return any
         
         else:
             print("You type a wrong date of birth.\n")
@@ -241,7 +211,7 @@ def signin():
 
     while is_valid == False:
         if attemp == 3:
-            print("You have used the maximum attemps of login:\nPlease reset the password by entering the below details:")
+            print("You have used the maximum attemps of login.\nPlease reset the password by entering the below details:")
             return signin_max_attemp_user()
         
         valid_user = validate_signin()
@@ -258,14 +228,23 @@ def signin():
             attemp += 1
 
 def signup():
+    is_valid = False
     name = input('\nPlease enter your full name: ')
 
-    mobile_number = input('Please enter your mobile number: ')
-    validate_mobile_number(mobile_number)
+    while is_valid == False:
+        mobile_number = input('Please enter your mobile number: ')
+        response = validate_mobile_number(mobile_number)
+        
+        if response != False:
+            break
     
-    password = input('Please enter your password: ')
-    confirm_password = input('Please confirm your password: ')
-    validate_password(password, confirm_password)
+    while is_valid == False:
+        password = input('Please enter your password: ')
+        confirm_password = input('Please confirm your password: ')
+        response = validate_password(password, confirm_password)
+        
+        if response != False:
+            break
     
     date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
     validate_date(date_of_birth)
