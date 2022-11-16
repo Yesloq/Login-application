@@ -108,6 +108,7 @@ def validate_date(date):
     
     return date
 
+# Sign up function
 def signup():
     is_valid = False
     temp_customer = Customer()
@@ -142,6 +143,7 @@ def signup():
     print('\nHas been successfully registered. \n')
     data_users.append(temp_customer)
 
+# Sign in function
 def signin():
     address = data_users[0].address
     validate = False
