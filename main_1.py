@@ -38,6 +38,42 @@ class Customer():
         self.dob = dob
         self.orders = []
 
+class Order():
+    id : str
+    order_type : str
+    date : str
+    customer : Customer()
+    product_list : list
+    sub_total_amount : float
+    service_amount : float
+    delivery_amount : float
+    total_amount : float
+
+    def __init__(self, date = "", customer = any):
+        self.id = ""
+        self.order_type = ""
+        self.date = date
+        self.customer = customer
+        self.product_list = []
+        self.sub_total_amount = 0.0
+        self.service_amount = 0.0
+        self.delivery_amount = 0.0
+        self.total_amount = 0.0
+    
+    def add_product(self, product):
+        pass
+
+    def calculate_sub_total_amount(self):
+        pass
+
+    def calculate_total_amount(self):
+        pass
+
+    def calculate_service_amount(self):
+        pass
+
+    def calculate_delivery_amount(self):
+        pass
 
 ##############################################
 #
