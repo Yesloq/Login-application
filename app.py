@@ -140,7 +140,6 @@ def signup():
         print('Only users over 21 years of age can register.\n')
         return
     
-    print('\nHas been successfully registered. \n')
     data_users.append(temp_customer)
 
 # Sign in function

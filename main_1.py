@@ -10,7 +10,7 @@ logged_user = any
 # Classes
 #
 ##############################################
-class Product:
+class Product():
     id : int
     name : str
     currency : str
@@ -21,6 +21,22 @@ class Product:
         self.name = name
         self.currency = currency
         self.price = price
+
+class Customer():
+    name : str
+    address : str
+    mobile : str
+    password : str
+    dob : str
+    orders : list
+
+    def __init__(self, name = "", address = "", mobile = "", password = "", dob = ""):
+        self.name = name
+        self.address = address
+        self.mobile = mobile
+        self.password = password
+        self.dob = dob
+        self.orders = []
 
 
 ##############################################
@@ -57,183 +73,201 @@ def initialize_product_list():
 #
 ##############################################
 def main_menu():
-    select = 0
-    while select != '3':
-        print ("")
-        print ("***********************************************************************")
-        print ("*                                                                     *")
-        print ("*                          RESTAURANT APP                             *")
-        print ("*                                                                     *")
-        print ("***********************************************************************")
-        print ("")
-        print ("Please Enter 1 for Sign up")
-        print ("Please Enter 2 for Sign in")
-        print ("Please Enter 3 for Quit application")
-
-        select = input('\n')
-
-        if select == '1':
-            signup()
-            select = '0'
-        
-        elif select == '2':
-            signin()
-            select = '0'
-
-        else:
-            select = input('Please Enter a valid option.\n')
-
+    global logged_user
     logged_user = any
 
+    print ("***********************************************************************")
+    print ("*                                                                     *")
+    print ("*                          RESTAURANT APP                             *")
+    print ("*                                                                     *")
+    print ("***********************************************************************")
+    print ("Please Enter 1 for Sign up")
+    print ("Please Enter 2 for Sign in")
+    print ("Please Enter 3 for Quit application")
+
+    select = input()
+
+    if select == '1':
+        signup()
+    
+    elif select == '2':
+        signin()
+
+    elif select == '3':
+        print('Thank You for using the Application')
+        return
+
+    else:
+        print('Please Enter a valid option\n')
+        main_menu()
 
 def signin_menu():
-    select = 0
-    while select != '2.3':
-        clean_screen()
-        print(logged_user)
-        print ("***********************************************************************")
-        print ("*")
-        print ("* WELCOME " + logged_user[0])
-        print ("*")
-        print ("***********************************************************************")
-        print ("")
-        print ("* Please Enter 2.1 to Start Ordering")
-        print ("* Please Enter 2.2 to Print Statistics")
-        print ("* Please Enter 2.3 for Logout")
+    global logged_user
+    
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*")
+    print ("* WELCOME " + logged_user.name)
+    print ("*")
+    print ("***********************************************************************")
+    print ("* Please Enter 2.1 to Start Ordering")
+    print ("* Please Enter 2.2 to Print Statistics")
+    print ("* Please Enter 2.3 for Logout")
 
-        select = input('\n')
+    select = input()
 
-        if select == '2.1':
-            start_ordering_menu()
-            select = '0'
-        
-        elif select == '2.2':
-            statistics_menu()
-            select = '0'
+    if select == '2.1':
+        start_ordering_menu()
+    
+    elif select == '2.2':
+        statistics_menu()
 
-        else:
-            select = input('Please Enter a valid option.\n')
+    elif select == '2.3':
+        print("Logout Successfully")
+        logged_user = any
+        main_menu()
+
+    else:
+        print('Please Enter a valid option.\n')
+        signin_menu()
 
 def start_ordering_menu():
-    select = 0
-    while select != '3':
-        clean_screen()
-        print ("***********************************************************************")
-        print ("* Please Enter 1 for Dine in")
-        print ("* Please Enter 2 for Order Online")
-        print ("* Please Enter 3 for Login Page")
-        print ("***********************************************************************")
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                     START ORDENING MENU                             *")
+    print ("***********************************************************************")
+    print ("* Please Enter 1 for Dine in")
+    print ("* Please Enter 2 for Order Online")
+    print ("* Please Enter 3 for Login Page")
 
-        select = input('\n')
+    select = input()
 
-        if select == '1':
-            dine_in()
-            select = '0'
-        
-        elif select == '2':
-            statistics_menu()
-            select = '0'
+    if select == '1':
+        dine_in()
+    
+    elif select == '2':
+        ordering_online_menu()
 
-        else:
-            select = input('Please Enter a valid option.\n')
+    elif select == '3':
+        signin_menu()
+
+    else:
+        print('Please Enter a valid option.\n')
+        start_ordering_menu()
 
 def ordering_online_menu():
-    select = 0
-    while select != '3':
-        clean_screen()
-        print ("***********************************************************************")
-        print ("* Please Enter 1 for Self Pickup")
-        print ("* Please Enter 2 for Home Delivery")
-        print ("* Please Enter 3 to go to previous Menu")
-        print ("***********************************************************************")
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                      ORDENING ONLINE MENU                           *")
+    print ("***********************************************************************")
+    print ("* Please Enter 1 for Self Pickup")
+    print ("* Please Enter 2 for Home Delivery")
+    print ("* Please Enter 3 to go to previous Menu")
 
-        select = input('\n')
+    select = input('\n')
 
-        if select == '1':
-            self_pickup()
-            select = '0'
-        
-        elif select == '2':
-            home_delivery()
-            select = '0'
+    if select == '1':
+        self_pickup()
+    
+    elif select == '2':
+        home_delivery()
 
-        else:
-            select = input('Please Enter a valid option.\n')
+    elif select == '3':
+        start_ordering_menu()
 
-def food_menu(menu_option):
-    select = 0
-    while select != 7:
-        clean_screen()
-        for product in food_list:
-            print("Enter " + str(product.id) + " for " + product.name + " \tPrice " + product.currency + " " + str(product.price))
+    else:
+        print('Please Enter a valid option.\n')
+        ordering_online_menu()
 
-        if menu_option == 2:
-            print("Enter 7 for Drinks Menu:")
-        else:
-            print("Enter 7 for Checkout:")
+def food_menu(order_type):
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                            FOOD MENU                                *")
+    print ("***********************************************************************")
 
-        select = int(input('\n'))
+    for product in food_list:
+        print("Enter " + str(product.id) + " for " + product.name + " \tPrice " + product.currency + " " + str(product.price))
 
-        if select == 7 and menu_option == 2:
-            drinks_menu()
-            select = '0'
+    if order_type == '2':
+        print("Enter 7 for Drinks Menu:")
+    else:
+        print("Enter 7 for Checkout:")
 
-        if select == 7 and menu_option != 2:
-            checkout()
-            select = '0'
-        
-        elif select > 7 or select < 0:
-            select = input('Please Enter a valid option.\n')
+    select = int(input('\n'))
 
-        else:
-            add_product_to_order(select)
+    if select == 7 and order_type == 2:
+        drinks_menu()
+
+    if select == 7 and order_type != 2:
+        checkout()
+    
+    elif select > 7 or select < 0:
+        print('Please Enter a valid option.\n')
+        food_menu(order_type)
+
+    else:
+        add_product_to_order(select)
+        food_menu()
 
         
 def drinks_menu():
-    select = 0
-    while select != 4:
-        clean_screen()
-        for product in drink_list:
-            print("Enter " + str(product.id) + " for " + product.name + " \tPrice " + product.currency + " " + str(product.price))
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                          DRINKS MENU                                *")
+    print ("***********************************************************************")
+    for product in drink_list:
+        print("Enter " + str(product.id) + " for " + product.name + " \tPrice " + product.currency + " " + str(product.price))
 
-        print("Enter 4 for Checkout:")
+    print("Enter 4 for Checkout:")
 
-        select = int(input('\n'))
+    select = int(input('\n'))
 
-        if select > 7 or select < 0:
-            select = input('Please Enter a valid option.\n')
+    if select > 4 or select < 0:
+        select = input('Please Enter a valid option.\n')
 
-        else:
-            add_product_to_order(select)
+    elif select == 4:
+        checkout()
 
-    checkout()
+    else:
+        add_product_to_order(select)
+        drinks_menu()
 
 def statistics_menu():
-    select = 0
-    while select != 4:
-        clean_screen()
-        print ("***********************************************************************")
-        print ("* Please Enter the Option to print the Statistcs")
-        print ("* 1 - All Dine in Orders")
-        print ("* 2 - All Pick up Orders")
-        print ("* 3 - All Deliveries")
-        print ("* 4 - All Orders (Ascending Order)")
-        print ("* 5 - Total Amount Spent on All Orders")
-        print ("* 6 - To go to Previuos Menu")
-        print ("***********************************************************************")
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                   PRINT STATISTICS MENU                             *")
+    print ("***********************************************************************")
+    print ("* Please Enter the Option to print the Statistcs")
+    print ("* 1 - All Dine in Orders")
+    print ("* 2 - All Pick up Orders")
+    print ("* 3 - All Deliveries")
+    print ("* 4 - All Orders (Ascending Order)")
+    print ("* 5 - Total Amount Spent on All Orders")
+    print ("* 6 - To go to Previuos Menu")
 
-        select = input('\n')
+    select = input('\n')
 
-        if select == '1':
-            self_pickup()
-            select = '0'
-        
-        elif select == '2':
-            home_delivery()
-            select = '0'
+    if select == '1':
+        all_dine_orders()
+    
+    elif select == '2':
+        all_pickup_orders()
 
-        else:
-            select = input('Please Enter a valid option.\n')
+    elif select == '3':
+        all_deliveries()
+
+    elif select == '4':
+        all_orders()
+
+    elif select == '5':
+        all_total_amount_orders()
+
+    elif select == '6':
+        signin_menu()
+
+    else:
+        print('Please Enter a valid option.\n')
+        statistics_menu()
 
 ##############################################
 #
@@ -259,7 +293,6 @@ def signin():
 
         elif valid_user != any:
             logged_user = valid_user
-            print(logged_user)
             signin_menu()
             attemp = 0
             is_valid = True
@@ -269,53 +302,55 @@ def signin():
 
 def signup():
     is_valid = False
-    name = input('\nPlease enter your full name: ')
+    temp_customer = Customer()
+    temp_customer.name = input('\nPlease enter your full name: ')
+    temp_customer.address = input('\nPlease enter your address or press enter to Skip: ')
 
     while is_valid == False:
-        mobile_number = input('Please enter your mobile number: ')
+        mobile_number = input('\nPlease enter your mobile number: ')
         response = validate_mobile_number(mobile_number)
         
         if response != False:
+            temp_customer.mobile = mobile_number
             break
     
     while is_valid == False:
-        password = input('Please enter your password: ')
-        confirm_password = input('Please confirm your password: ')
+        password = input('\nPlease enter your password: ')
+        confirm_password = input('\nPlease confirm your password: ')
         response = validate_password(password, confirm_password)
         
         if response != False:
+            temp_customer.password = password
             break
     
-    date_of_birth = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
+    date_of_birth = input('\nPlease Enter your Date of Birth # DD/MM/YYYY (No Space): ')
     validate_date(date_of_birth)
     age = 2022 - int(date_of_birth[-4:])
 
     if age < 21:
         print('Only users over 21 years of age can register.\n')
         return
-
-    data_users.append([
-        name,
-        mobile_number,
-        password,
-        date_of_birth
-    ])
+    
+    data_users.append(temp_customer)
 
     print('You have Successfully Signed up.\n')
     
-    return data_users
 
 def dine_in():
     print("Dine in options")
+    start_ordering_menu()
 
 def order_online():
     print("Dine in options")
+    start_ordering_menu()
 
 def self_pickup():
     print("Self Pickup options")
+    ordering_online_menu()
 
 def home_delivery():
     print("Home Delivery options")
+    ordering_online_menu()
 
 def add_product_to_order(product_id):
     print("Add product by id process" + str(product_id))
@@ -325,18 +360,23 @@ def checkout():
 
 def all_dine_orders():
     print("All Dine in Orders")
+    statistics_menu()
 
 def all_pickup_orders():
     print("All Pick up Orders")
+    statistics_menu()
 
 def all_deliveries():
     print("All Deliveries")
+    statistics_menu()
 
 def all_orders():
     print("All Orders (Ascending Order)")
+    statistics_menu()
 
 def all_total_amount_orders():
     print("Total Amount Spent on All Orders")
+    statistics_menu()
 
 
 ##############################################
@@ -344,6 +384,13 @@ def all_total_amount_orders():
 # Validate functions
 #
 ##############################################
+
+# This function validates the address
+def validate_address(address):
+    if address == '':
+        return False
+    else:
+        return True
 
 #This function validates mobile number
 def validate_mobile_number(mobile_number):
@@ -434,7 +481,7 @@ def find_user_by_username(username):
     user_found = False
     for user in data_users:
         
-        if user[1] == username:
+        if user.mobile == username:
             user_found = True
             return user
     
@@ -524,10 +571,10 @@ def validate_signin():
     user = find_user_by_username(username)
 
     if user != any:
-        if user[1] == username:
+        if user.mobile == username:
 
-            if user[2] == password:
-                print('You have Successfully Signed in.\nWelcome ' + user[0] + '\n')
+            if user.password == password:
+                print('You have Successfully Signed in.\nWelcome ', user.name, '\n')
                 return user
 
             else:
