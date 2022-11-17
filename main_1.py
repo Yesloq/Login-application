@@ -4,6 +4,7 @@ data_users = []
 food_list = []
 drink_list = []
 logged_user = any
+customer_order = any
 
 ##############################################
 #
@@ -42,6 +43,8 @@ class Order():
     id : str
     order_type : str
     date : str
+    number_persons : str
+    time : str
     ordered_product : list
     sub_total_amount : float
     service_amount : float
@@ -52,23 +55,34 @@ class Order():
         self.id = ""
         self.order_type = ""
         self.date = date
+        self.number_persons = ""
+        self.time = ""
         self.ordered_product = []
         self.sub_total_amount = 0.0
         self.service_amount = 0.0
         self.delivery_amount = 0.0
         self.total_amount = 0.0
     
-    def add_product(self, product):
-        pass
+    def add_ordered_product(self, product):
+        self.ordered_product.append(product)
 
     def calculate_sub_total_amount(self):
-        pass
+        
+        for product in self.ordered_product:
+
+            self.sub_total_amount += product.price
+        
 
     def calculate_total_amount(self):
-        pass
+        self.calculate_sub_total_amount()
+        self.calculate_service_amount()
+        self.calculate_delivery_amount()
+
+        self.total_amount = self.sub_total_amount + self.service_amount + self.delivery_amount
 
     def calculate_service_amount(self):
-        pass
+        if self.order_type == 'dine_in':
+            self.service_amount = self.sub_total_amount * 0.15
 
     def calculate_delivery_amount(self):
         pass
@@ -89,6 +103,7 @@ def clean_screen ():
         print ("")
 
 def initialize_product_list():
+    data_users.append(Customer('Yesid', '', '0987654321', 'jh@23', '11/09/1995'))
     food_list.append(Product(1, "Noodles", "AUD", 2))
     food_list.append(Product(2, "Sandwich", "AUD", 4))
     food_list.append(Product(3, "Dumpling", "AUD", 6))
@@ -213,7 +228,9 @@ def ordering_online_menu():
         print('Please Enter a valid option.\n')
         ordering_online_menu()
 
-def food_menu(order_type):
+def food_menu():
+    global customer_order
+    
     clean_screen()
     print ("***********************************************************************")
     print ("*                            FOOD MENU                                *")
@@ -222,29 +239,30 @@ def food_menu(order_type):
     for product in food_list:
         print("Enter " + str(product.id) + " for " + product.name + " \tPrice " + product.currency + " " + str(product.price))
 
-    if order_type == '2':
+    if customer_order.order_type == 'dine_in':
         print("Enter 7 for Drinks Menu:")
     else:
         print("Enter 7 for Checkout:")
 
     select = int(input('\n'))
 
-    if select == 7 and order_type == 2:
+    if select == 7 and customer_order.order_type == 'dine_in':
         drinks_menu()
 
-    if select == 7 and order_type != 2:
+    if select == 7 and customer_order.order_type != 'dine_in':
         checkout()
     
     elif select > 7 or select < 0:
         print('Please Enter a valid option.\n')
-        food_menu(order_type)
-
-    else:
-        add_product_to_order(select)
         food_menu()
 
-        
+    else:
+        add_product_to_order(select, 'food_list')
+        food_menu()
+       
 def drinks_menu():
+    global customer_order
+
     clean_screen()
     print ("***********************************************************************")
     print ("*                          DRINKS MENU                                *")
@@ -263,7 +281,7 @@ def drinks_menu():
         checkout()
 
     else:
-        add_product_to_order(select)
+        add_product_to_order(select, 'drink_list')
         drinks_menu()
 
 def statistics_menu():
@@ -368,10 +386,14 @@ def signup():
     data_users.append(temp_customer)
 
     print('You have Successfully Signed up.\n')
+    main_menu()
     
 
 def dine_in():
-    food_menu(2)
+    global customer_order
+    customer_order = Order()
+    customer_order.order_type = "dine_in"
+    food_menu()
     #start_ordering_menu()
 
 def order_online():
@@ -386,11 +408,61 @@ def home_delivery():
     print("Home Delivery options")
     ordering_online_menu()
 
-def add_product_to_order(product_id):
-    print("Add product by id process" + str(product_id))
+def add_product_to_order(product_id, product_type):
+    global customer_order
+    
+    if product_type == 'food_list':
+        for product in food_list:
+
+            if product.id == product_id:
+
+                customer_order.add_ordered_product(product)
+    
+    else:
+        for product in drink_list:
+
+            if product.id == product_id:
+
+                customer_order.add_ordered_product(product)
+    
+    # for x in customer_order.ordered_product:
+    #     print('The products ordered are: ', x.name)
+    # print("Add product by id process: " + str(product_id))
 
 def checkout():
-    print("Checkout process")
+    global customer_order
+
+    select = input('\nPlease Enter Y to proceed to Checkout or Enter N to cancel the order: ')
+
+    if select == 'Y':
+
+        customer_order.calculate_total_amount()
+
+        if customer_order.order_type == 'dine_in':
+            print('Your total payble amount is: ', customer_order.total_amount, 'inclusing AUD ', customer_order.service_amount, 'for service charges')
+
+            date = input('\nPlease enter the Date of Booking for Dine in (DD/MM/YYYY): ')
+            validate_date(date)
+
+            if validate_date:
+                customer_order.date = date
+            
+            customer_order.time = input('\nPlease enter the Time of Bookinf for Dine in (HH:MM): ')
+            customer_order.number_persons = input('\nPlease enter the number of persons: ')
+
+            logged_user.orders.append(customer_order)
+            print('\nThank You for entering the details, your booking is confirmed.')
+
+            signin_menu()
+
+    elif select == 'N':
+        signin_menu()
+
+    else:
+        print('\nPlease enter a valid oprtion.')
+        checkout()
+
+    # print("Checkout process")
 
 def all_dine_orders():
     print("All Dine in Orders")
@@ -495,7 +567,7 @@ def validate_password(password, confirm_password):
     
     return False
 
-#This function validates date of birth
+#This function validates dates
 def validate_date(date):
     is_valid = False
 
@@ -506,7 +578,7 @@ def validate_date(date):
         
         except ValueError:
             print('The date format is DD/MM/YYYY\n')
-            date = input('Please Enter your Date of Birth # DD/MM/YYYY (No Space): ')
+            date = input('Please Enter your Date following the format # DD/MM/YYYY (No Space): ')
     
     return date
 
