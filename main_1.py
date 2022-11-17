@@ -42,19 +42,17 @@ class Order():
     id : str
     order_type : str
     date : str
-    customer : Customer()
-    product_list : list
+    ordered_product : list
     sub_total_amount : float
     service_amount : float
     delivery_amount : float
     total_amount : float
 
-    def __init__(self, date = "", customer = any):
+    def __init__(self, date = ""):
         self.id = ""
         self.order_type = ""
         self.date = date
-        self.customer = customer
-        self.product_list = []
+        self.ordered_product = []
         self.sub_total_amount = 0.0
         self.service_amount = 0.0
         self.delivery_amount = 0.0
@@ -373,8 +371,8 @@ def signup():
     
 
 def dine_in():
-    print("Dine in options")
-    start_ordering_menu()
+    food_menu(2)
+    #start_ordering_menu()
 
 def order_online():
     print("Dine in options")
