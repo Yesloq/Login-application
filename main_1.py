@@ -261,6 +261,8 @@ def start_ordering_menu():
         start_ordering_menu()
 
 def ordering_online_menu():
+    global logged_user
+
     clean_screen()
     print ("***********************************************************************")
     print ("*                      ORDENING ONLINE MENU                           *")
@@ -275,6 +277,20 @@ def ordering_online_menu():
         self_pickup()
     
     elif select == '2':
+        if logged_user.address == "":
+            print('\nYou have not mentioned your address, while signing up.\nPlease Enter Y if you would like to enter your address.\nEnter N if you would like other mode of order.')
+            select = input()
+
+            if select == 'Y':
+                logged_user.address = input('Please enter your address: ')
+
+            elif select == 'N':
+                signin_menu()
+
+            else:
+                print('Please Enter a valid option.\n')
+                ordering_online_menu()
+
         home_delivery()
 
     elif select == '3':
@@ -412,7 +428,7 @@ def signin():
 def signup():
     is_valid = False
     temp_customer = Customer()
-    temp_customer.name = input('Please enter your full name: ')
+    temp_customer.name = input('\nPlease enter your full name: ')
     temp_customer.address = input('Please enter your address or press enter to Skip: ')
 
     while is_valid == False:
@@ -486,14 +502,14 @@ def checkout():
     global customer_order
     global logged_user
 
-    select = input('Please Enter Y to proceed to Checkout or Enter N to cancel the order: ')
+    select = input('\nPlease Enter Y to proceed to Checkout or Enter N to cancel the order: ')
 
     if select == 'Y':
 
         customer_order.calculate_total_amount()
 
         if customer_order.order_type == 'dine_in':
-            print('Your total payble amount is: ', customer_order.total_amount, 'inclusing AUD ', customer_order.service_amount, 'for service charges')
+            print('Your total payble amount is: ', customer_order.total_amount, 'inclusing AUD ', customer_order.service_amount, 'for service charges\n')
 
             date = input('Please enter the Date of Booking for Dine in (DD/MM/YYYY): ')
             validate_date(date)
@@ -505,7 +521,7 @@ def checkout():
             print('Thank You for entering the details, your booking is confirmed.')
             
         elif customer_order.order_type == 'self_pickup':
-            print('Your total payble amount is: ', customer_order.total_amount, 'AUD')
+            print('Your total payble amount is: ', customer_order.total_amount, 'AUD\n')
 
             date = input('Please enter the Date of pick up (DD/MM/YYYY): ')
             validate_date(date)
@@ -517,6 +533,7 @@ def checkout():
             print('Thank You for entering the details, your booking is confirmed.')           
         
         elif customer_order.order_type == 'delivery':
+            print('Your total payble amount is: ', customer_order.total_amount, 'AUD and there will be an additional charges for Delivery\n')
 
             date = input('Please enter the Date of delivery (DD/MM/YYYY): ')
             validate_date(date)
@@ -532,6 +549,8 @@ def checkout():
                 checkout()
             
             else:
+
+
                 customer_order.distance = distance
                 customer_order.delivery_amount = delivery_amount
                 customer_order.calculate_total_amount()
@@ -712,7 +731,7 @@ def validate_user_password():
 
 #This funtion validates sign in information
 def validate_signin():
-    username = input('Please enter your username (Mobile Number): ')
+    username = input('\nPlease enter your username (Mobile Number): ')
     password = input('Please enter your password: ')
     user = find_user_by_username(username)
 
