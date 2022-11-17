@@ -45,11 +45,13 @@ class Order():
     date : str
     number_persons : str
     time : str
+    name_pickup : str
     ordered_product : list
     sub_total_amount : float
     service_amount : float
     delivery_amount : float
     total_amount : float
+    distance : float
 
     def __init__(self, date = ""):
         self.id = ""
@@ -57,11 +59,13 @@ class Order():
         self.date = date
         self.number_persons = ""
         self.time = ""
+        self.name_pickup = ""
         self.ordered_product = []
         self.sub_total_amount = 0.0
         self.service_amount = 0.0
         self.delivery_amount = 0.0
         self.total_amount = 0.0
+        self.distance = 0.0
     
     def add_ordered_product(self, product):
         self.ordered_product.append(product)
@@ -76,17 +80,13 @@ class Order():
     def calculate_total_amount(self):
         self.calculate_sub_total_amount()
         self.calculate_service_amount()
-        self.calculate_delivery_amount()
 
         self.total_amount = self.sub_total_amount + self.service_amount + self.delivery_amount
 
     def calculate_service_amount(self):
         if self.order_type == 'dine_in':
             self.service_amount = self.sub_total_amount * 0.15
-
-    def calculate_delivery_amount(self):
-        pass
-
+        
 ##############################################
 #
 # Auxiliary functions
@@ -249,7 +249,7 @@ def food_menu():
     if select == 7 and customer_order.order_type == 'dine_in':
         drinks_menu()
 
-    if select == 7 and customer_order.order_type != 'dine_in':
+    elif select == 7 and customer_order.order_type != 'dine_in':
         checkout()
     
     elif select > 7 or select < 0:
@@ -394,19 +394,18 @@ def dine_in():
     customer_order = Order()
     customer_order.order_type = "dine_in"
     food_menu()
-    #start_ordering_menu()
-
-def order_online():
-    print("Dine in options")
-    start_ordering_menu()
 
 def self_pickup():
-    print("Self Pickup options")
-    ordering_online_menu()
+    global customer_order
+    customer_order = Order()
+    customer_order.order_type = "self_pickup"
+    food_menu()
 
 def home_delivery():
-    print("Home Delivery options")
-    ordering_online_menu()
+    global customer_order
+    customer_order = Order()
+    customer_order.order_type = "delivery"
+    food_menu()
 
 def add_product_to_order(product_id, product_type):
     global customer_order
@@ -424,10 +423,6 @@ def add_product_to_order(product_id, product_type):
             if product.id == product_id:
 
                 customer_order.add_ordered_product(product)
-    
-    # for x in customer_order.ordered_product:
-    #     print('The products ordered are: ', x.name)
-    # print("Add product by id process: " + str(product_id))
 
 def checkout():
     global customer_order
@@ -443,17 +438,49 @@ def checkout():
 
             date = input('\nPlease enter the Date of Booking for Dine in (DD/MM/YYYY): ')
             validate_date(date)
-
-            if validate_date:
-                customer_order.date = date
+            customer_order.date = date
             
             customer_order.time = input('\nPlease enter the Time of Bookinf for Dine in (HH:MM): ')
             customer_order.number_persons = input('\nPlease enter the number of persons: ')
 
-            logged_user.orders.append(customer_order)
             print('\nThank You for entering the details, your booking is confirmed.')
+            
+        elif customer_order.order_type == 'self_pickup':
+            print('Your total payble amount is: ', customer_order.total_amount, 'AUD')
 
-            signin_menu()
+            date = input('\nPlease enter the Date of pick up (DD/MM/YYYY): ')
+            validate_date(date)
+            customer_order.date = date
+
+            customer_order.time = input('\nPlease enter the Time of pick up (HH:MM): ')
+            customer_order.name_pickup = input('\nPlease enter the name of the person: ') 
+
+            print('\nThank You for entering the details, your booking is confirmed.')           
+        
+        elif customer_order.order_type == 'delivery':
+
+            date = input('\nPlease enter the Date of delivery (DD/MM/YYYY): ')
+            validate_date(date)
+            customer_order.date = date
+
+            customer_order.time = input('\nPlease enter the Time of delivery (HH:MM): ')
+            distance = float(input('\nPlease enter the distance from the restaurant: '))
+            delivery_amount = calculate_delivery_amount(distance)
+
+            if delivery_amount == False:
+                customer_order.order_type = 'pick_up'
+                print('\nDelivery distance limit exceeded. Pickup option will be enabled.')
+                checkout()
+            
+            else:
+                customer_order.distance = distance
+                customer_order.delivery_amount = delivery_amount
+                customer_order.calculate_total_amount()
+                print('\nThank You for your orden, your order has been confirmed.')
+
+        logged_user.orders.append(customer_order)
+        print(len(logged_user.orders))
+        signin_menu()
 
     elif select == 'N':
         signin_menu()
@@ -461,8 +488,6 @@ def checkout():
     else:
         print('\nPlease enter a valid oprtion.')
         checkout()
-
-    # print("Checkout process")
 
 def all_dine_orders():
     print("All Dine in Orders")
@@ -490,6 +515,20 @@ def all_total_amount_orders():
 # Validate functions
 #
 ##############################################
+
+def calculate_delivery_amount(distance):
+    delivery_amount = False
+
+    if distance > 0.0 and distance <= 5.0:
+        delivery_amount = 5.0
+    
+    elif distance > 5.0 and distance <= 10.0:
+        delivery_amount = 10.0
+    
+    elif distance > 10.0 and distance <= 15.0:
+        delivery_amount = 18.0
+    
+    return delivery_amount
 
 # This function validates the address
 def validate_address(address):
