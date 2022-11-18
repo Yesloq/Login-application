@@ -380,16 +380,16 @@ def statistics_menu():
     select = input()
 
     if select == '1':
-        all_dine_orders()
+        print_statistics('dine_in')
     
     elif select == '2':
-        all_pickup_orders()
+        print_statistics('self_pickup')
 
     elif select == '3':
-        all_deliveries()
+        print_statistics('delivery')
 
     elif select == '4':
-        all_orders()
+        print_statistics('orders')
 
     elif select == '5':
         all_total_amount_orders()
@@ -399,7 +399,8 @@ def statistics_menu():
 
     else:
         print('Please Enter a valid option.\n')
-        statistics_menu()
+    
+    statistics_menu()
 
 ##############################################
 #
@@ -559,10 +560,10 @@ def checkout():
             else:
                 customer_order.distance = distance
                 customer_order.delivery_amount = delivery_amount
-                customer_order.calculate_total_amount()
+                #customer_order.calculate_total_amount()
                 print('Thank You for your orden, your order has been confirmed.')
 
-        customer_order.id = order_id_format()
+        customer_order.id = create_order_id_format()
         logged_user.orders.append(customer_order)
         signin_menu()
 
@@ -573,26 +574,34 @@ def checkout():
         print('Please enter a valid oprtion.')
         checkout()
 
-def all_dine_orders():
-    print("All Dine in Orders")
-    statistics_menu()
+def print_statistics(order_type):
+    global logged_user
 
-def all_pickup_orders():
-    print("All Pick up Orders")
-    statistics_menu()
+    clean_screen()
+    print ("***********************************************************************")
+    print ("*                           STATISTICS                                *")
+    print ("***********************************************************************")
 
-def all_deliveries():
-    print("All Deliveries")
-    statistics_menu()
+    if order_type == 'dine_in' or order_type == 'self_pickup':
+        print('Order ID\t Date\t\t Total Amount Paid\t Type of Order')
+    else:
+        print('Order ID\t Date\t\t Order Amount Paid\t Type of Order')
 
-def all_orders():
-    print("All Orders (Ascending Order)")
-    statistics_menu()
+    for order in logged_user.orders:
+
+        if order.order_type == order_type:
+            print(order.id, '\t\t', order.date, '\t', order.total_amount, '\t\t\t', order.order_type)
 
 def all_total_amount_orders():
-    print("Total Amount Spent on All Orders")
-    statistics_menu()
+    global logged_user
+    total_amount = 0.0
 
+    for order in logged_user.orders:
+        total_amount += order.total_amount + order.delivery_amount
+    
+    print('Total amount spent on all orders AUD: ', total_amount)
+
+    signin_menu()
 
 ##############################################
 #
