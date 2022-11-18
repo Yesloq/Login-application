@@ -5,6 +5,7 @@ food_list = []
 drink_list = []
 logged_user = any
 customer_order = any
+order_counter = 0;
 
 ##############################################
 #
@@ -169,6 +170,13 @@ def reset_password(user):
 
     clean_screen()
     main_menu()
+
+#This function allow to create order id with format S000x
+def create_order_id_format():
+    global order_counter
+
+    order_counter += 1
+    return 'S' + str(order_counter).zfill(4)
 
 ##############################################
 #
@@ -549,15 +557,13 @@ def checkout():
                 checkout()
             
             else:
-
-
                 customer_order.distance = distance
                 customer_order.delivery_amount = delivery_amount
                 customer_order.calculate_total_amount()
                 print('Thank You for your orden, your order has been confirmed.')
 
+        customer_order.id = order_id_format()
         logged_user.orders.append(customer_order)
-        print(len(logged_user.orders))
         signin_menu()
 
     elif select == 'N':
