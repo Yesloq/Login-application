@@ -380,16 +380,16 @@ def statistics_menu():
     select = input()
 
     if select == '1':
-        print_statistics('dine_in')
+        print_statistics('dine_in', 'All Dine in Orders statistics')
     
     elif select == '2':
-        print_statistics('self_pickup')
+        print_statistics('self_pickup', 'All Pick up Orders statistics')
 
     elif select == '3':
-        print_statistics('delivery')
+        print_statistics('delivery', 'All Deliveries statistics')
 
     elif select == '4':
-        print_statistics('orders')
+        print_statistics('all_orders', 'All Orders statistics')
 
     elif select == '5':
         all_total_amount_orders()
@@ -521,8 +521,7 @@ def checkout():
             print('Your total payble amount is: ', customer_order.total_amount, 'inclusing AUD ', customer_order.service_amount, 'for service charges\n')
 
             date = input('Please enter the Date of Booking for Dine in (DD/MM/YYYY): ')
-            validate_date(date)
-            customer_order.date = date
+            customer_order.date = validate_date(date)
             
             customer_order.time = input('Please enter the Time of Bookinf for Dine in (HH:MM): ')
             customer_order.number_persons = input('Please enter the number of persons: ')
@@ -533,8 +532,7 @@ def checkout():
             print('Your total payble amount is: ', customer_order.total_amount, 'AUD\n')
 
             date = input('Please enter the Date of pick up (DD/MM/YYYY): ')
-            validate_date(date)
-            customer_order.date = date
+            customer_order.date = validate_date(date)
 
             customer_order.time = input('Please enter the Time of pick up (HH:MM): ')
             customer_order.name_pickup = input('Please enter the name of the person: ') 
@@ -545,8 +543,7 @@ def checkout():
             print('Your total payble amount is: ', customer_order.total_amount, 'AUD and there will be an additional charges for Delivery\n')
 
             date = input('Please enter the Date of delivery (DD/MM/YYYY): ')
-            validate_date(date)
-            customer_order.date = date
+            customer_order.date = validate_date(date)
 
             customer_order.time = input('Please enter the Time of delivery (HH:MM): ')
             distance = float(input('Please enter the distance from the restaurant: '))
@@ -574,12 +571,12 @@ def checkout():
         print('Please enter a valid oprtion.')
         checkout()
 
-def print_statistics(order_type):
+def print_statistics(order_type, title):
     global logged_user
 
     clean_screen()
     print ("***********************************************************************")
-    print ("*                           STATISTICS                                *")
+    print ("*               ", title)
     print ("***********************************************************************")
 
     if order_type == 'dine_in' or order_type == 'self_pickup':
@@ -589,7 +586,7 @@ def print_statistics(order_type):
 
     for order in logged_user.orders:
 
-        if order.order_type == order_type:
+        if order.order_type == order_type or order_type == 'all_orders':
             print(order.id, '\t\t', order.date, '\t', order.total_amount, '\t\t\t', order.order_type)
 
 def all_total_amount_orders():
