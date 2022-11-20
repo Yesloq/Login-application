@@ -45,15 +45,15 @@ class Product():
 class Customer():
     name : str
     address : str
-    mobile : str
+    mobile_number : str
     password : str
     dob : str
     orders : list
 
-    def __init__(self, name = "", address = "", mobile = "", password = "", dob = ""):
+    def __init__(self, name = "", address = "", mobile_number = "", password = "", dob = ""):
         self.name = name
         self.address = address
-        self.mobile = mobile
+        self.mobile_number = mobile_number
         self.password = password
         self.dob = dob
         self.orders = []
@@ -62,36 +62,37 @@ class Order():
     id : str
     order_type : str
     date : str
-    number_persons : str
     time : str
-    name_pickup : str
-    ordered_product : list
+    ordered_products : list
     sub_total_amount : float
-    service_amount : float
-    delivery_amount : float
     total_amount : float
-    distance : float
 
-    def __init__(self, date = ""):
-        self.id = ""
+    def __init__(self):
+        self.id = id
         self.order_type = ""
-        self.date = date
-        self.number_persons = ""
+        self.date = ""
         self.time = ""
-        self.name_pickup = ""
-        self.ordered_product = []
+        self.ordered_products = []
         self.sub_total_amount = 0.0
-        self.service_amount = 0.0
-        self.delivery_amount = 0.0
         self.total_amount = 0.0
-        self.distance = 0.0
     
     def add_ordered_product(self, product):
-        self.ordered_product.append(product)
+        print(self.order_type)
+        print("llegue")
+        self.ordered_products.append(product)
 
     def calculate_sub_total_amount(self):
-        for product in self.ordered_product:
+        for product in self.ordered_products:
             self.sub_total_amount += product.price
+
+class DineInOrder(Order):
+    number_persons : int
+    service_amount : float
+
+    def __init__(self):
+        super().__init__()
+        self.number_persons = 0
+        self.service_amount = 0.0
 
     def calculate_total_amount(self):
         self.calculate_sub_total_amount()
@@ -101,6 +102,30 @@ class Order():
     def calculate_service_amount(self):
         if self.order_type == 'dine_in':
             self.service_amount = self.sub_total_amount * 0.15
+
+class SelfPickupOrder(Order):
+    name_pickup : str
+
+    def __init__(self):
+        super().__init__()
+        self.name_pickup = ""
+
+    def calculate_total_amount(self):
+        self.calculate_sub_total_amount()
+        self.total_amount = self.sub_total_amount 
+
+class HomeDeliveryOrder(Order):
+    distance : float
+    delivery_amount : float
+
+    def __init__(self):
+        super().__init__()
+        self.distance = 0.0
+        self.delivery_amount = 0.0
+
+    def calculate_total_amount(self):
+        self.calculate_sub_total_amount()
+        self.total_amount = self.sub_total_amount + self.delivery_amount
 
 
 ##############################################
@@ -185,7 +210,7 @@ def main_menu():
 
     elif select == '3':
         print('Thank You for using the Application')
-        return
+        raise SystemExit
 
     else:
         print('Please Enter a valid option\n')
@@ -205,7 +230,7 @@ def signup():
         response = validate_mobile_number(mobile_number)
         
         if response != False:
-            customer.mobile = mobile_number
+            customer.mobile_number = mobile_number
             break
     
     while is_valid == False:
@@ -244,10 +269,20 @@ def validate_mobile_number(mobile_number):
     
     elif mobile_number[0] != '0':
         print('The cell number must begin with 0\n')
+
+    elif validate_user_exists(mobile_number) == False:
+        print('There is already a registered user with this mobile number\n')
     else:    
         return mobile_number
     
     return False
+
+#This function validates if exists an user registered with the mobile number
+def validate_user_exists(username):
+    for user in data_users:
+        if user.mobile_number == username:
+            return False
+    return True
 
 #This function validates passwords
 def validate_password(password, confirm_password):
@@ -376,7 +411,7 @@ def validate_signin():
     user = find_user_by_username(username)
 
     if user != any:
-        if user.mobile == username:
+        if user.mobile_number == username:
 
             if user.password == password:
                 return user
@@ -392,7 +427,7 @@ def find_user_by_username(username):
     user_found = False
     for user in data_users:
         
-        if user.mobile == username:
+        if user.mobile_number == username:
             user_found = True
             return user
     
@@ -552,21 +587,21 @@ def ordering_online_menu():
 #This function is in charge to set customer order information whit 'dine_in' order type
 def dine_in():
     global customer_order
-    customer_order = Order()
+    customer_order = DineInOrder()
     customer_order.order_type = "dine_in"
     food_menu()
 
 #This function is in charge to set customer order information whit 'self_pickup' order type
 def self_pickup():
     global customer_order
-    customer_order = Order()
+    customer_order = SelfPickupOrder()
     customer_order.order_type = "self_pickup"
     food_menu()
 
 #This function is in charge to set customer order information whit 'delivery' order type
 def home_delivery():
     global customer_order
-    customer_order = Order()
+    customer_order = HomeDeliveryOrder()
     customer_order.order_type = "delivery"
     food_menu()
 
@@ -703,6 +738,7 @@ def checkout():
             else:
                 customer_order.distance = distance
                 customer_order.delivery_amount = delivery_amount
+                customer_order.calculate_total_amount() #To include delivery amount on total amount calculation
                 print('Thank You for your orden, your order has been confirmed.')
 
         customer_order.id = create_order_id_format()
@@ -805,9 +841,9 @@ def all_total_amount_orders():
     total_amount = 0.0
 
     for order in logged_user.orders:
-        total_amount += order.total_amount + order.delivery_amount
+        total_amount += order.total_amount
     
-    print('Total amount spent on all orders AUD: ', total_amount)
+    print('\nTotal amount spent on all orders AUD: ', total_amount)
 
 #********************************************************************************
 
